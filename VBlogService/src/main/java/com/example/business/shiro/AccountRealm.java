@@ -53,7 +53,7 @@ public class AccountRealm extends AuthorizingRealm {
         }
         AccountProfile profile = new AccountProfile();
         BeanUtil.copyProperties(user, profile);
-        log.info("profile----------------->{}",profile.toString());
+        log.info("profile----------------->{}",profile);
         return new SimpleAuthenticationInfo(profile, jwt.getCredentials(), getName());
 
     }

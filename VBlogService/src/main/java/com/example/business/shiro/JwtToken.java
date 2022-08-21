@@ -9,11 +9,13 @@ package com.example.business.shiro;
 import lombok.AllArgsConstructor;
 import org.apache.shiro.authc.AuthenticationToken;
 
-@AllArgsConstructor
 public class JwtToken implements AuthenticationToken {
 
     private String token;
 
+    public JwtToken(String jwt) {
+        this.token = jwt;
+    }
 
     @Override
     public Object getPrincipal() {

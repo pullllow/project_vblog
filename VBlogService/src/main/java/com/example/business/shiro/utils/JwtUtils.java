@@ -19,6 +19,7 @@ import java.util.Date;
 @Component
 @ConfigurationProperties(prefix = "vblog.jwt")
 public class JwtUtils {
+
     private String secret;
     private long expire;
     private String header;

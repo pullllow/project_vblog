@@ -1,13 +1,11 @@
 package com.example.controller;
 
 
+import com.example.entity.User;
 import com.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -24,9 +22,10 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/{id}")
-    public Object test(@PathVariable("id") Long id) {
-        return userService.getById(id);
+    @PostMapping("/save")
+    public Object test(@Validated @RequestBody User user) {
+        userService.save(user);
+        return user.toString();
     }
 
 }

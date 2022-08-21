@@ -13,13 +13,13 @@ import java.io.Serializable;
 @Data
 public class RestResponse implements Serializable {
 
-    private String code;
+    private Integer code;
     private String mess;
     private Object data;
 
     public static RestResponse success(Object data) {
         RestResponse response = new RestResponse();
-        response.setCode("200");
+        response.setCode(200);
         response.setMess("success");
         response.setData(data);
         return response;
@@ -27,7 +27,7 @@ public class RestResponse implements Serializable {
 
     public static RestResponse success(String mess, Object data) {
         RestResponse response = new RestResponse();
-        response.setCode("200");
+        response.setCode(200);
         response.setMess(mess);
         response.setData(data);
         return response;
@@ -35,14 +35,23 @@ public class RestResponse implements Serializable {
 
     public static RestResponse fail(String mess) {
         RestResponse response = new RestResponse();
-        response.setCode("400");
+        response.setCode(400);
         response.setMess(mess);
         return response;
     }
 
+
     public static RestResponse fail(String mess, Object data) {
         RestResponse response = new RestResponse();
-        response.setCode("400");
+        response.setCode(400);
+        response.setMess(mess);
+        response.setData(data);
+        return response;
+    }
+
+    public static RestResponse fail(int code, String mess, Object data) {
+        RestResponse response = new RestResponse();
+        response.setCode(code);
         response.setMess(mess);
         response.setData(data);
         return response;

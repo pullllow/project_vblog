@@ -1,6 +1,6 @@
 package com.example.entity;
 
-import com.example.entity.BaseEntity;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;

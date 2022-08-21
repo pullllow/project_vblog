@@ -86,6 +86,8 @@ shiro缓存会话消息 redis存储数据
 
 	JwtUtils 
 		生成和校验jwt的工具类，其中jwt相关的密钥信息根据项目配置文件的中配置
+		@ConfigurationProperties springboot 提供读取配置文件的注解
+		实现了BeanPostProcessor接口，在bean被实例化后，会调用后置处理，递归的查找属性，通过反射注入值，对大多数属性而言强制需提供其setter和getter方法。
 
 	AccountProfile
 		在登录成功后返回给用户信息的载体
@@ -122,6 +124,19 @@ shiro缓存会话消息 redis存储数据
 		4. preHandle: 拦截器的前置拦截，拦截器需要提供跨域支持，不能在进入Controller之前被限制
 
 
+
+		使用shiro框架的时候所有请求经过过滤器Filter 来到onPreHandle方法
+			· isAccessAllowed 判断是否登录
+				登录情况下走此方法，返回true直接访问控制器
+				如果isAccessAllowed方法返回True，则不会再调用onAccessDenied方法，如果isAccessAllowed方法返回Flase,则会继续调用onAccessDenied方法。
+			· onAccessDenied 是否拒绝登录
+				没有登录情况下走此方法
+				onAccessDenied方法里面则是具体执行登陆的地方。由于我们已经登陆，所以此方法就会返回True(filter放行),所以上面的onPreHandle方法里面的onAccessDenied方法就不会被执行。
+
+
+
+
+
 五、异常处理
 
 	服务器报错处理，配置异常处理机制
@@ -130,4 +145,53 @@ shiro缓存会话消息 redis存储数据
 	@ExceptionHandler(value=RuntimeException.class) 指定捕获的Exception 该处理是全局的
 
 	所有异常处理都会在common.exception.GlobalExceptionHandler
+
+	定义全局异常处理
+		@ControllerAdvice 定义全局控制器异常处理
+		@ExceptionHandler 针对性异常处理，对每种异常针对性处理
+
+			· ShiroException：shiro抛出的异常，比如没有权限，用户登录异常
+			· IllegalArgumentException：处理Assert的异常
+			· MethodArgumentNotValidException：处理实体校验的异常
+			· RuntimeException：捕捉其他异常
+
+
+	@RequestBody主要用来接收前端传递给后端的json字符串中的数据的(请求体中的数据的)；
+
+六、实体校验
+	表单数据提交时
+		前端校验使用JQuery Valitdate js插件实现
+		后端校验使用Hibernate validatior校验
+
+	springboot 自动集成 Hibernate validatior
+
+	1.  在实体的属性上添加对应的校验规则
+		@TableId
+		@NotBlank
+		@Email
+
+	2. 使用@Validated注解，如果注解不符合要求，系统抛出异常MethodArgumentNotValidException
+		在Controller 接口@RequestBody 入参使用
+
+
+七、 后台进行全局跨域处理
+	后台进行全局跨域处理
+		CorsConfig implements WebMvcConfigurer 自定义Handler, Interceptor, ViewResolver, MessageConverter等对SpringMVC框架进行配置
+
+
+八、登录接口开发
+
+	登录逻辑 接受账号密码，根据用户id生成jwt，返回前端（为了后续的jwt延期，把jwt放到header）
+
+	```
+		退出登陆不是jwt失效了，一样可以登陆的，这是jwt的弊端
+		需要把jwt状态化，比如存在redis中，存在说明可以登陆，退出就清除，但这样就失去了jwt的无状态得特性了
+	```
+
+	@CrossOrign
+	是用来处理跨域请求的注解，在Controller中添加此注解
+
+	跨域，指的是浏览器不能执行其他网站的脚本。它是由浏览器的同源策略造成的，是浏览器对JavaScript施加的安全限制。所谓同源是指，域名，协议，端口均相同
+	(**localhost和127.0.0.1虽然都指向本机，但也属于跨域。)
+
 

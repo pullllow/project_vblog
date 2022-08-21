@@ -20,6 +20,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /*
  *  @author changqi
@@ -34,74 +35,70 @@ public class JwtFilter extends AuthenticatingFilter {
     @Autowired
     JwtUtils jwtUtils;
 
-    private static final String HEADER_TOKEN = "x-user-token";
-
-
     @Override
     protected AuthenticationToken createToken(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
-        // 获取token
+
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        String jwt = request.getHeader(HEADER_TOKEN);
-        if (StringUtils.hasLength(jwt)) {
+        String jwt = request.getHeader("x-user-token");
+        if(!StringUtils.hasLength(jwt)) {
             return null;
         }
+
         return new JwtToken(jwt);
     }
 
     @Override
     protected boolean onAccessDenied(ServletRequest servletRequest, ServletResponse servletResponse) throws Exception {
+
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        String token = request.getHeader(HEADER_TOKEN);
-        if (StringUtils.hasLength(token)) {
+        String jwt = request.getHeader("x-user-token");
+        if(!StringUtils.hasLength(jwt)) {
             return true;
         } else {
-            // 判断是否过期
-            Claims claim = jwtUtils.getClaimByToken(token);
-            if (claim == null || jwtUtils.isTokenExpired(claim.getExpiration())) {
+
+            // 校验jwt
+            Claims claim = jwtUtils.getClaimByToken(jwt);
+            if(claim == null || jwtUtils.isTokenExpired(claim.getExpiration())) {
                 throw new ExpiredCredentialsException("token已失效，请重新登录");
             }
+
+            // 执行登录
+            return executeLogin(servletRequest, servletResponse);
         }
-        // 执行自动登录
-        return executeLogin(servletRequest, servletResponse);
     }
 
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+
+        Throwable throwable = e.getCause() == null ? e : e.getCause();
+        RestResponse result = RestResponse.fail(throwable.getMessage());
+        String json = JSONUtil.toJsonStr(result);
+
         try {
-            Throwable throwable = e.getCause() == null ? e : e.getCause();
-            RestResponse restResponse = RestResponse.fail(throwable.getMessage());
-            String json = JSONUtil.toJsonStr(restResponse);
-            httpResponse.getWriter().print(json);
-        } catch (Exception ex) {
+            httpServletResponse.getWriter().print(json);
+        } catch (IOException ioException) {
 
         }
         return false;
     }
 
-    /**
-     * 提供跨域支持
-     *
-     * @param request
-     * @param response
-     * @return
-     **/
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+
         HttpServletRequest httpServletRequest = WebUtils.toHttp(request);
         HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
-        httpServletResponse.setHeader("Access-Control-Allow-Origin",
-                httpServletRequest.getHeader("Origin"));
-        httpServletResponse.setHeader("Access-Control-Allow-Methods",
-                "GET,POST,OPTIONS,PUT,DELETE");
-        httpServletResponse.setHeader("Access-Control-Allow-Headers",
-                httpServletRequest.getHeader("Access-Control-Allow-Headers"));
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", httpServletRequest.getHeader("Origin"));
+        httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers", httpServletRequest.getHeader("Access-Control-Request-Headers"));
 
-        //跨域校验时，首先发送OPTIONS请求，给OPTIONS请求直接返回正常状态
-        if(httpServletRequest.getMethod().equals(RequestMethod.OPTIONS.name())) {
-            httpServletResponse.setStatus(HttpStatus.OK.value());
+        // 跨域时会首先发送一个OPTIONS请求，这里我们给OPTIONS请求直接返回正常状态
+        if (httpServletRequest.getMethod().equals(RequestMethod.OPTIONS.name())) {
+            httpServletResponse.setStatus(org.springframework.http.HttpStatus.OK.value());
             return false;
         }
+
         return super.preHandle(request, response);
     }
 }
