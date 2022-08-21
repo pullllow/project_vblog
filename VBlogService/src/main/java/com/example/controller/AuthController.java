@@ -3,20 +3,28 @@ package com.example.controller;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.additional.query.impl.QueryChainWrapper;
+
 import com.example.business.shiro.utils.JwtUtils;
 import com.example.common.dto.LoginDto;
 import com.example.common.lang.RestResponse;
+import com.example.common.util.ValidationUtil;
 import com.example.entity.User;
 import com.example.service.UserService;
+import com.google.code.kaptcha.Producer;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * @author Chang Qi
@@ -26,7 +34,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 
 @RestController
-public class AccountController {
+public class AuthController {
+
+    private static final String KAPTCHA_SESSION_KEY = "KAPTCHA_SESSION_KEY";
+
+    @Autowired
+    Producer producer;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -60,6 +73,39 @@ public class AccountController {
     public RestResponse logout() {
         SecurityUtils.getSubject().logout();
         return RestResponse.success(null);
+    }
+
+    @PostMapping("/register")
+    public RestResponse register(@Validated @RequestBody(required = false) User user, @RequestBody(required = false)String repass, @RequestBody(required = false)String vercode, HttpServletRequest request) {
+
+        ValidationUtil.ValidResult validResult = ValidationUtil.validateBean(user);
+        if(validResult.hasErrors()) {
+            return  RestResponse.fail(validResult.getErrors());
+        }
+        if(!user.getPassword().equals(repass)) {
+            return RestResponse.fail("两次输入密码不一致");
+        }
+        // 获取验证码
+        String kaptcha = (String) request.getSession().getAttribute(KAPTCHA_SESSION_KEY);
+        if(!StringUtils.hasLength(vercode) || !vercode.equalsIgnoreCase(kaptcha)) {
+            return RestResponse.fail("验证码输入不正确");
+        }
+
+        //注册
+         return userService.register(user);
+    }
+
+    @GetMapping("/kaptcha.jpg")
+    public void kaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //验证码
+        String text = producer.createText();
+        BufferedImage image = producer.createImage(text);
+        request.getSession().setAttribute(KAPTCHA_SESSION_KEY, text);
+
+        response.setHeader("Cache-Control", "no-store, no-cache");
+        response.setContentType("image/jpeg");
+        ServletOutputStream outputStream = response.getOutputStream();
+        ImageIO.write(image, "jpg", outputStream);
     }
 
 }

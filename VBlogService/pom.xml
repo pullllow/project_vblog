@@ -86,12 +86,12 @@
             <version>0.9.1</version>
         </dependency>
 
-        <!--Hibernate validation 实体属性校验规则-->
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>2.0.2</version>
-        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>jakarta.validation</groupId>-->
+<!--            <artifactId>jakarta.validation-api</artifactId>-->
+<!--            <version>2.0.2</version>-->
+<!--        </dependency>-->
 
         <!--解决：SpringBoot Configuration Annotation Processor not configured的错误-->
         <dependency>
@@ -99,6 +99,21 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!--验证码-->
+        <dependency>
+            <groupId>com.github.axet</groupId>
+            <artifactId>kaptcha</artifactId>
+            <version>0.0.9</version>
+        </dependency>
+
+        <!--validation-->
+        <!--Hibernate validation 实体属性校验规则-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
 
 
 
