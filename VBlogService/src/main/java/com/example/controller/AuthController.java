@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.example.business.shiro.utils.JwtUtils;
 import com.example.common.dto.LoginDto;
+import com.example.common.dto.RegisterDto;
 import com.example.common.lang.RestResponse;
 import com.example.common.util.ValidationUtil;
 import com.example.entity.User;
@@ -76,23 +77,40 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public RestResponse register(@Validated @RequestBody(required = false) User user, @RequestBody(required = false)String repass, @RequestBody(required = false)String vercode, HttpServletRequest request) {
-
-        ValidationUtil.ValidResult validResult = ValidationUtil.validateBean(user);
+    public RestResponse register(@Validated @RequestBody(required = false)RegisterDto registerDto, HttpServletRequest request) {
+        RestResponse restResponse = new RestResponse();
+        ValidationUtil.ValidResult validResult = ValidationUtil.validateBean(registerDto);
         if(validResult.hasErrors()) {
-            return  RestResponse.fail(validResult.getErrors());
+            restResponse = RestResponse.fail(validResult.getErrors());
+            return restResponse;
         }
-        if(!user.getPassword().equals(repass)) {
-            return RestResponse.fail("两次输入密码不一致");
+
+
+        if(!registerDto.getPassword().equals(registerDto.getRepass())) {
+            restResponse =  RestResponse.fail("两次输入密码不一致");
+            return restResponse;
         }
         // 获取验证码
         String kaptcha = (String) request.getSession().getAttribute(KAPTCHA_SESSION_KEY);
-        if(!StringUtils.hasLength(vercode) || !vercode.equalsIgnoreCase(kaptcha)) {
-            return RestResponse.fail("验证码输入不正确");
+        if(!StringUtils.hasLength(registerDto.getVercode()) || !registerDto.getVercode().equalsIgnoreCase(kaptcha)) {
+            restResponse =  RestResponse.fail("验证码输入不正确");
+            return restResponse;
+        }
+        User user;
+
+        try {
+            user = new User();
+            user.setUsername(registerDto.getUsername());
+            user.setPassword(registerDto.getPassword());
+            user.setEmail(registerDto.getEmail());
+            //注册
+            restResponse = userService.register(user);
+        } catch (Exception e) {
+
+        } finally {
+            return restResponse;
         }
 
-        //注册
-         return userService.register(user);
     }
 
     @GetMapping("/kaptcha.jpg")

@@ -1,5 +1,7 @@
 package com.example.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.common.vo.PostVo;
 import com.example.entity.Post;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PostService extends IService<Post> {
 
+    PostVo selectOnePost(QueryWrapper<Post> eq);
 }
