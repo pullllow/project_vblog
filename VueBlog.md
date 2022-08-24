@@ -208,3 +208,39 @@ shiro缓存会话消息 redis存储数据
 
 
 
+
+九、VUE前端页面开发
+
+1、vue 前端
+
+	vue
+	elements-ui
+	axios
+	mavon-editor
+	markdown-it
+	github-markdown-cssr
+
+	
+2. 环境准备
+	node.js
+	npm
+
+	vue环境
+
+	```
+	# 安装淘宝npm
+	npm install -g cnpm --registry=https://registry.npm.taobao.org
+	# vue-cli 安装依赖包
+	cnpm install --g vue-cli
+
+	```
+
+3.新建vue项目
+	```
+	# 打开vue的可视化管理工具界面
+	vue ui
+	```
+
+	淘宝npm(cnpm) 提高安装依赖速度
+	vue ui是@vue /cli3.0 新增的可视化项目管理工具，可以运行项目，打包项目，检查等操作。
+

@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>VBlogService</artifactId>
+    <artifactId>vblogservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>VBlogService</name>
-    <description>VBlogService</description>
+    <name>vblogservice</name>
+    <description>vblogservice</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
