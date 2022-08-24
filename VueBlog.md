@@ -211,7 +211,7 @@ shiro缓存会话消息 redis存储数据
 
 九、VUE前端页面开发
 
-1、vue 前端
+1. vue 前端
 
 	vue
 	elements-ui
@@ -235,7 +235,7 @@ shiro缓存会话消息 redis存储数据
 
 	```
 
-3.新建vue项目
+3. 新建vue项目vblogwebsite
 	```
 	# 打开vue的可视化管理工具界面
 	vue ui
@@ -243,4 +243,96 @@ shiro缓存会话消息 redis存储数据
 
 	淘宝npm(cnpm) 提高安装依赖速度
 	vue ui是@vue /cli3.0 新增的可视化项目管理工具，可以运行项目，打包项目，检查等操作。
+
+
+	http://localhost:8080 
+	
+	创建vue项目 创建目录和运行vue ui同一级 方便管理和切换
+
+	【手动】-> 勾选路由Router、状态管理Vuex, 去掉js校验
+	-> 【Use history mode for router】->【创建项目，不保存预设】
+
+	vblogwebsite项目结构
+
+	```
+	├── README.md            项目介绍
+	├── index.html           入口页面
+	├── build              构建脚本目录
+	│  ├── build-server.js         运行本地构建服务器，可以访问构建后的页面
+	│  ├── build.js            生产环境构建脚本
+	│  ├── dev-client.js          开发服务器热重载脚本，主要用来实现开发阶段的页面自动刷新
+	│  ├── dev-server.js          运行本地开发服务器
+	│  ├── utils.js            构建相关工具方法
+	│  ├── webpack.base.conf.js      wabpack基础配置
+	│  ├── webpack.dev.conf.js       wabpack开发环境配置
+	│  └── webpack.prod.conf.js      wabpack生产环境配置
+	├── config             项目配置
+	│  ├── dev.env.js           开发环境变量
+	│  ├── index.js            项目配置文件
+	│  ├── prod.env.js           生产环境变量
+	│  └── test.env.js           测试环境变量
+	├── mock              mock数据目录
+	│  └── hello.js
+	├── package.json          npm包配置文件，里面定义了项目的npm脚本，依赖包等信息
+	├── src               源码目录 
+	│  ├── main.js             入口js文件
+	│  ├── app.vue             根组件
+	│  ├── components           公共组件目录
+	│  │  └── title.vue
+	│  ├── assets             资源目录，这里的资源会被wabpack构建
+	│  │  └── images
+	│  │    └── logo.png
+	│  ├── routes             前端路由
+	│  │  └── index.js
+	│  ├── store              应用级数据（state）状态管理
+	│  │  └── index.js
+	│  └── views              页面目录
+	│    ├── hello.vue
+	│    └── notfound.vue
+	├── static             纯静态资源，不会被wabpack构建。
+	└── test              测试文件目录（unit&e2e）
+	  └── unit              单元测试
+	    ├── index.js            入口脚本
+	    ├── karma.conf.js          karma配置文件
+	    └── specs              单测case目录
+	      └── Hello.spec.js
+
+	```
+
+4. 安装element-ui(element.eleme.cn) 组件
+
+	```
+	# 切换到项目根目录
+	cd vueblog-vue
+	# 安装element-ui
+	cnpm install element-ui --save
+	```
+	在src目录下main.js 引入element-ui依赖
+
+5. 安装axios（www.axios-js.com)
+
+	axios基于promise的HTTP库，进行前后端对接时，可以提高开发效率
+
+	安装命令
+
+	```
+	cnpm install axios --save
+	```
+
+	main.js中全局引入axios
+
+	```
+	import axios from 'axios'
+	Vue.prototype.$axios = axios //
+	```
+
+6. 页面路由
+
+	定义路由和页面
+
+	views文件夹下定义页面：
+		Post.vue
+
+	路由中心配置
+	router\index.js
 
